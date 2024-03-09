@@ -1,5 +1,6 @@
 package com.towich.vktest.ui.screen.product
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,7 +48,9 @@ fun ProductScreen(
     val product: ProductUIModel = viewModel.getCurrentProduct() ?: Constants.errorProduct
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -94,7 +98,8 @@ fun ProductScreen(
                         .fillMaxWidth(0.6f),
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Medium,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Row(
                     modifier = Modifier
@@ -111,7 +116,8 @@ fun ProductScreen(
                     Text(
                         text = product.rating.toString(),
                         modifier = Modifier.padding(start = 8.dp, end = 16.dp),
-                        fontSize = 30.sp
+                        fontSize = 30.sp,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -134,8 +140,8 @@ fun ProductScreen(
                     text = product.brand,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     fontSize = 16.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -152,7 +158,8 @@ fun ProductScreen(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "${product.discountPercentage}% OFF",
@@ -166,7 +173,8 @@ fun ProductScreen(
             Text(
                 text = product.description,
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.primary
             )
 
             Text(
@@ -174,6 +182,7 @@ fun ProductScreen(
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

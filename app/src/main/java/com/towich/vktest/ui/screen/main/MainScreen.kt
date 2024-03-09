@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,9 +42,9 @@ fun MainScreen(
     val listOfProducts by viewModel.listOfProducts.collectAsState()
     val listOfSearchedProducts by viewModel.listOfSearchedProducts.collectAsState()
 
-    var searchBarText by remember { mutableStateOf("") }
-    var searchBarActive by remember { mutableStateOf(false) }
-    var showSearchBar by remember { mutableStateOf(false) }
+    var searchBarText by rememberSaveable { mutableStateOf("") }
+    var searchBarActive by rememberSaveable { mutableStateOf(false) }
+    var showSearchBar by rememberSaveable { mutableStateOf(false) }
 
     when (uiState) {
         is MainScreenUiState.Success<*> -> {
@@ -90,7 +91,11 @@ fun MainScreen(
                     EndlessGrid(
                         lazyGridState = rememberLazyGridState(),
                         listOfProducts = listOfSearchedProducts,
-                        isLoading = uiState is MainScreenUiState.Loading
+                        isLoading = uiState is MainScreenUiState.Loading,
+                        onProductClicked = { product: ProductUIModel ->
+                            viewModel.setCurrentProduct(product)
+                            navController.navigate(Screen.ProductScreen.route)
+                        }
                     )
                 }
             } else {
@@ -102,7 +107,11 @@ fun MainScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = { showSearchBar = true }) {
+                        IconButton(onClick = {
+                            showSearchBar = true
+                            searchBarText = ""
+                            viewModel.clearListOfSearchedProducts()
+                        }) {
                             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                         }
                     },

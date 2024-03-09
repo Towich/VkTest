@@ -103,4 +103,8 @@ class MainViewModel @Inject constructor(
     fun setCurrentProduct(newProduct: ProductUIModel){
         repository.setCurrentProduct(newProduct)
     }
+
+    fun clearListOfSearchedProducts(){
+        _listOfSearchedProducts.value = null
+    }
 }
