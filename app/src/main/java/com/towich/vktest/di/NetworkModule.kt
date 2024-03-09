@@ -2,7 +2,7 @@ package com.towich.vktest.di
 
 import android.util.Log
 import com.towich.vktest.network.ApiService
-import com.example.exploremarks.network.ApiServiceImpl
+import com.towich.vktest.network.ApiServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
