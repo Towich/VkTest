@@ -52,7 +52,7 @@ fun ProductItem(
                 color = Color.Gray.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(30.dp)
             )
-            .shadow(elevation = 10.dp),
+            .shadow(elevation = 10.dp)
     ) {
         Column() {
             Box(

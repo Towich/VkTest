@@ -1,22 +1,21 @@
 package com.towich.vktest.ui.screen.main
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,10 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.towich.vktest.data.model.ProductUIModel
-import com.towich.vktest.data.source.DebugObject
 import com.towich.vktest.ui.screen.main.components.EndlessGrid
-import com.towich.vktest.ui.screen.main.components.ProductItemShimmerEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,9 +37,10 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listOfProducts by viewModel.listOfProducts.collectAsState()
+    val listOfSearchedProducts by viewModel.listOfSearchedProducts.collectAsState()
 
-    var text by remember { mutableStateOf("") } // Query for SearchBar
-    var active by remember { mutableStateOf(false) } // Active state for SearchBar
+    var searchBarText by remember { mutableStateOf("") }
+    var searchBarActive by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
 
     when (uiState) {
@@ -63,25 +60,37 @@ fun MainScreen(
     Scaffold(
         topBar = {
             if (showSearchBar) {
+                searchBarActive = true
                 SearchBar(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    query = text,
+                    query = searchBarText,
                     onQueryChange = {
-                        text = it
+                        searchBarText = it
                     },
-                    onSearch = {
-
+                    onSearch = { query ->
+                        viewModel.searchProducts(query)
                     },
-                    active = active,
+                    active = searchBarActive,
                     onActiveChange = {
-                        active = it
-                        if (!active) {
+                        searchBarActive = it
+                        if (!searchBarActive) {
                             showSearchBar = false
                         }
-                    }
+                    },
+                    placeholder = {
+                        Text(text = "Enter a product..")
+                    },
+                    colors = SearchBarDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 ) {
-                    Text(text = "heelo")
+                    EndlessGrid(
+                        lazyGridState = rememberLazyGridState(),
+                        listOfProducts = listOfSearchedProducts,
+                        isLoading = uiState is MainScreenUiState.Loading,
+                        onReachedBottom = {}
+                    )
                 }
             } else {
                 TopAppBar(
@@ -95,41 +104,30 @@ fun MainScreen(
                         IconButton(onClick = { showSearchBar = true }) {
                             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 )
             }
         }
     ) { innerPadding ->
-        if (uiState is MainScreenUiState.Loading && listOfProducts == null) {
-            LazyVerticalGrid(
-                state = rememberLazyGridState(),
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                itemsIndexed(
-                    items = DebugObject.listOfProducts, // TODO
-                    key = { _: Int, item: ProductUIModel ->
-                        item.hashCode()
-                    }
-                ) { _, item ->
-                    ProductItemShimmerEffect()
-                }
-            }
-        } else {
-            // observe list scrolling
-            EndlessGrid(
-                lazyGridState = lazyGridState,
-                listOfProducts = listOfProducts,
-                modifier = Modifier.padding(innerPadding),
-                onReachedBottom = {
-                    viewModel.loadMoreProducts()
-                }
-            )
-        }
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(innerPadding)
+        )
 
+        EndlessGrid(
+            lazyGridState = lazyGridState,
+            listOfProducts = listOfProducts,
+            isLoading = uiState is MainScreenUiState.Loading && listOfProducts == null,
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(1.dp),
+            onReachedBottom = {
+                viewModel.loadMoreProducts()
+            }
+        )
     }
 }

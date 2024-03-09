@@ -15,11 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.towich.vktest.data.model.ProductUIModel
+import com.towich.vktest.data.source.DebugObject
 
 @Composable
 fun EndlessGrid(
     lazyGridState: LazyGridState,
     listOfProducts: List<ProductUIModel>?,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
     onReachedBottom: () -> Unit
 ){
@@ -45,13 +47,20 @@ fun EndlessGrid(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
     ) {
-        itemsIndexed(
-            items = listOfProducts ?: listOf(),
-            key = { _: Int, item: ProductUIModel ->
-                item.hashCode()
+        if(isLoading){
+            items(count = 6){
+                ProductItemShimmerEffect()
             }
-        ) { _, item ->
-            ProductItem(productUIModel = item)
+        }
+        else{
+            itemsIndexed(
+                items = listOfProducts ?: listOf(),
+                key = { _: Int, item: ProductUIModel ->
+                    item.hashCode()
+                }
+            ) { _, item ->
+                ProductItem(productUIModel = item)
+            }
         }
     }
 }

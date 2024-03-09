@@ -22,7 +22,10 @@ class MainViewModel @Inject constructor(
     private val _listOfProducts = MutableStateFlow<MutableList<ProductUIModel>?>(null)
     val listOfProducts: StateFlow<List<ProductUIModel>?> = _listOfProducts
 
-    var currentPage = 0
+    private val _listOfSearchedProducts = MutableStateFlow<List<ProductUIModel>?>(null)
+    val listOfSearchedProducts: StateFlow<List<ProductUIModel>?> = _listOfSearchedProducts
+
+    private var currentPage = 0
 
     init {
         performGetListOfProducts()
@@ -63,6 +66,27 @@ class MainViewModel @Inject constructor(
                     _uiState.value = MainScreenUiState.Success(result.data)
                     _listOfProducts.value?.addAll(result.data)
                     currentPage++
+                }
+
+                is ApiResult.Error -> {
+                    _uiState.value = MainScreenUiState.Error(result.error)
+                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun searchProducts(query: String){
+        viewModelScope.launch {
+            _uiState.value = MainScreenUiState.Loading
+
+            when (val result = repository.getProducts(query = query)) {
+                is ApiResult.Success -> {
+                    _uiState.value = MainScreenUiState.Success(result.data)
+                    _listOfSearchedProducts.value = result.data
                 }
 
                 is ApiResult.Error -> {

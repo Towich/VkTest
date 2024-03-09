@@ -14,7 +14,12 @@ class MainRepositoryImpl(
     }
 
     override suspend fun getProducts(skip: Int): ApiResult<List<ProductUIModel>> {
-        return apiService.getProducts(skip)
+        return apiService.getProducts(skip = skip)
     }
+
+    override suspend fun getProducts(query: String): ApiResult<List<ProductUIModel>> {
+        return apiService.getProducts(query = query)
+    }
+
 
 }
