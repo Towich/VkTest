@@ -18,6 +18,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.data.source.DebugObject
-import com.towich.vktest.ui.screen.main.components.ProductItem
+import com.towich.vktest.ui.screen.main.components.EndlessGrid
+import com.towich.vktest.ui.screen.main.components.ProductItemShimmerEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,9 +39,26 @@ fun MainScreen(
     navController: NavController,
     viewModel: MainViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val listOfProducts by viewModel.listOfProducts.collectAsState()
+
     var text by remember { mutableStateOf("") } // Query for SearchBar
     var active by remember { mutableStateOf(false) } // Active state for SearchBar
     var showSearchBar by remember { mutableStateOf(false) }
+
+    when (uiState) {
+        is MainScreenUiState.Success<*> -> {
+            viewModel.changeUiState(MainScreenUiState.Initial)
+        }
+
+        is MainScreenUiState.Error -> {
+            // TODO
+        }
+
+        else -> {}
+    }
+
+    val lazyGridState = rememberLazyGridState()
 
     Scaffold(
         topBar = {
@@ -81,23 +100,36 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        LazyVerticalGrid(
-            state = rememberLazyGridState(),
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .padding(innerPadding),
-            contentPadding = PaddingValues(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            itemsIndexed(
-                items = DebugObject.listOfProducts, // TODO
-                key = { _: Int, item: ProductUIModel ->
-                    item.hashCode()
+        if (uiState is MainScreenUiState.Loading && listOfProducts == null) {
+            LazyVerticalGrid(
+                state = rememberLazyGridState(),
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .padding(innerPadding),
+                contentPadding = PaddingValues(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                itemsIndexed(
+                    items = DebugObject.listOfProducts, // TODO
+                    key = { _: Int, item: ProductUIModel ->
+                        item.hashCode()
+                    }
+                ) { _, item ->
+                    ProductItemShimmerEffect()
                 }
-            ) { _, item ->
-                ProductItem(productUIModel = item)
             }
+        } else {
+            // observe list scrolling
+            EndlessGrid(
+                lazyGridState = lazyGridState,
+                listOfProducts = listOfProducts,
+                modifier = Modifier.padding(innerPadding),
+                onReachedBottom = {
+                    viewModel.loadMoreProducts()
+                }
+            )
         }
+
     }
 }

@@ -37,11 +37,10 @@ import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.data.source.DebugObject
 import com.towich.vktest.ui.theme.Green
 import com.towich.vktest.ui.theme.VkTestTheme
+import com.towich.vktest.ui.util.shimmerEffect
 
 @Composable
-fun ProductItem(
-    productUIModel: ProductUIModel
-) {
+fun ProductItemShimmerEffect() {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +51,8 @@ fun ProductItem(
                 color = Color.Gray.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(30.dp)
             )
-            .shadow(elevation = 10.dp),
+            .shadow(elevation = 10.dp)
+            .shimmerEffect(toShow = true),
     ) {
         Column() {
             Box(
@@ -64,61 +64,39 @@ fun ProductItem(
                         width = 1.dp,
                         color = Color.Gray.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(30.dp)
-                    ),
+                    )
+                    .shimmerEffect(true),
                 contentAlignment = Alignment.Center
             ) {
-                SubcomposeAsyncImage(
-                    model = productUIModel.thumbnail,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    loading = {
-                        CircularProgressIndicator()
-                    }
-                )
+
             }
             Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
-                Text(
-                    text = productUIModel.title,
-                    fontSize = 16.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                Box(modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(30.dp)
+                    .padding(top = 10.dp)
+//                    .background(color = Color.Gray)
+                    .clip(RoundedCornerShape(30.dp))
+                    .shimmerEffect(true)
                 )
-                Text(
-                    text = "${productUIModel.price}$",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                Box(modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(30.dp)
+                    .padding(top = 10.dp)
+//                    .background(color = Color.Gray)
+                    .clip(RoundedCornerShape(30.dp))
+                    .shimmerEffect(true)
                 )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "${productUIModel.discountPercentage.toInt()}% OFF",
-                        color = Green,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.star_icon),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = productUIModel.rating.toString(),
-                            modifier = Modifier.padding(start = 5.dp)
-                        )
-                    }
-
-                }
+                Box(modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .height(30.dp)
+                    .padding(top = 10.dp)
+//                    .background(color = Color.Gray)
+                    .clip(RoundedCornerShape(30.dp))
+                    .shimmerEffect(true)
+                )
             }
         }
     }
@@ -127,14 +105,6 @@ fun ProductItem(
 @Preview(widthDp = 200, heightDp = 350)
 @Composable
 private fun Preview() {
-    VkTestTheme {
-        ProductItem(productUIModel = DebugObject.listOfProducts[0])
-    }
-}
-
-@Preview(widthDp = 200, heightDp = 350)
-@Composable
-private fun Preview2() {
     VkTestTheme {
         ProductItemShimmerEffect()
     }

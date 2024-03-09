@@ -3,6 +3,7 @@ package com.towich.vktest.di
 import android.app.Application
 import com.towich.vktest.data.repository.MainRepository
 import com.towich.vktest.data.repository.MainRepositoryImpl
+import com.towich.vktest.network.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,10 +17,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideMainRepository(
-        app: Application
+        app: Application,
+        apiService: ApiService
     ): MainRepository {
         return MainRepositoryImpl(
-            appContext = app
+            appContext = app,
+            apiService = apiService
         )
     }
 }
