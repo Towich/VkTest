@@ -4,7 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.towich.vktest.data.model.ProductUIModel
+import com.towich.vktest.data.source.Constants
 import com.towich.vktest.ui.screen.main.MainScreen
+import com.towich.vktest.ui.screen.product.ProductScreen
 
 @Composable
 fun Navigation(
@@ -16,6 +20,9 @@ fun Navigation(
     ) {
         composable(route = Screen.MainScreen.route){
             MainScreen(navController = navController)
+        }
+        composable(route = Screen.ProductScreen.route) {
+            ProductScreen(navController = navController)
         }
     }
 }

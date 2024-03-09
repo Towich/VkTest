@@ -99,4 +99,8 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun setCurrentProduct(newProduct: ProductUIModel){
+        repository.setCurrentProduct(newProduct)
+    }
 }

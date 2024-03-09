@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.towich.vktest.data.model.ProductUIModel
+import com.towich.vktest.navigation.Screen
 import com.towich.vktest.ui.screen.main.components.EndlessGrid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,8 +90,7 @@ fun MainScreen(
                     EndlessGrid(
                         lazyGridState = rememberLazyGridState(),
                         listOfProducts = listOfSearchedProducts,
-                        isLoading = uiState is MainScreenUiState.Loading,
-                        onReachedBottom = {}
+                        isLoading = uiState is MainScreenUiState.Loading
                     )
                 }
             } else {
@@ -127,6 +128,10 @@ fun MainScreen(
                 .padding(1.dp),
             onReachedBottom = {
                 viewModel.loadMoreProducts()
+            },
+            onProductClicked = { product: ProductUIModel ->
+                viewModel.setCurrentProduct(product)
+                navController.navigate(Screen.ProductScreen.route)
             }
         )
     }

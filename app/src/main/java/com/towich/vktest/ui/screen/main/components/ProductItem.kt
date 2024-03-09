@@ -2,6 +2,7 @@ package com.towich.vktest.ui.screen.main.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,13 +35,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.towich.vktest.R
 import com.towich.vktest.data.model.ProductUIModel
-import com.towich.vktest.data.source.DebugObject
 import com.towich.vktest.ui.theme.Green
 import com.towich.vktest.ui.theme.VkTestTheme
 
 @Composable
 fun ProductItem(
-    productUIModel: ProductUIModel
+    productUIModel: ProductUIModel,
+    onClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -53,6 +54,9 @@ fun ProductItem(
                 shape = RoundedCornerShape(30.dp)
             )
             .shadow(elevation = 10.dp)
+            .clickable {
+                onClick()
+            }
     ) {
         Column() {
             Box(
@@ -124,13 +128,13 @@ fun ProductItem(
     }
 }
 
-@Preview(widthDp = 200, heightDp = 350)
-@Composable
-private fun Preview() {
-    VkTestTheme {
-        ProductItem(productUIModel = DebugObject.listOfProducts[0])
-    }
-}
+//@Preview(widthDp = 200, heightDp = 350)
+//@Composable
+//private fun Preview() {
+//    VkTestTheme {
+//        ProductItem(productUIModel = DebugObject.listOfProducts[0])
+//    }
+//}
 
 @Preview(widthDp = 200, heightDp = 350)
 @Composable

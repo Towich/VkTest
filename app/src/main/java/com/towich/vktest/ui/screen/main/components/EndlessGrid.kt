@@ -2,7 +2,6 @@ package com.towich.vktest.ui.screen.main.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -15,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.towich.vktest.data.model.ProductUIModel
-import com.towich.vktest.data.source.DebugObject
 
 @Composable
 fun EndlessGrid(
@@ -23,7 +21,8 @@ fun EndlessGrid(
     listOfProducts: List<ProductUIModel>?,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
-    onReachedBottom: () -> Unit
+    onReachedBottom: () -> Unit = {},
+    onProductClicked: (product: ProductUIModel) -> Unit = {}
 ){
     val buffer = 1 // load more when scroll reaches last n item, where n >= 1
 
@@ -59,7 +58,9 @@ fun EndlessGrid(
                     item.hashCode()
                 }
             ) { _, item ->
-                ProductItem(productUIModel = item)
+                ProductItem(productUIModel = item){
+                    onProductClicked(item)
+                }
             }
         }
     }

@@ -2,12 +2,14 @@ package com.towich.vktest.data.repository
 
 import android.app.Application
 import com.towich.vktest.data.model.ProductUIModel
+import com.towich.vktest.data.source.SessionStorage
 import com.towich.vktest.network.ApiService
 import com.towich.vktest.util.ApiResult
 
 class MainRepositoryImpl(
     private val appContext: Application,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val sessionStorage: SessionStorage
 ): MainRepository {
     override suspend fun getProducts(): ApiResult<List<ProductUIModel>> {
         return apiService.getProducts()
@@ -19,6 +21,14 @@ class MainRepositoryImpl(
 
     override suspend fun getProducts(query: String): ApiResult<List<ProductUIModel>> {
         return apiService.getProducts(query = query)
+    }
+
+    override fun getCurrentProduct(): ProductUIModel? {
+        return sessionStorage.currentProduct
+    }
+
+    override fun setCurrentProduct(newProduct: ProductUIModel) {
+        sessionStorage.currentProduct = newProduct
     }
 
 
