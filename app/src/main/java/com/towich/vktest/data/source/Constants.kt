@@ -4,7 +4,6 @@ import com.towich.vktest.data.model.ProductUIModel
 
 object Constants {
     const val LIMIT_PRODUCTS = 20
-    const val PRODUCT_SCREEN_PARAM_PRODUCT = "productModel"
     val errorProduct = ProductUIModel(
         id = 0,
         title = "error",

@@ -9,8 +9,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val repository: MainRepository
-): ViewModel() {
-
+) : ViewModel() {
     fun getCurrentProduct(): ProductUIModel? {
         return repository.getCurrentProduct()
     }

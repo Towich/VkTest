@@ -3,7 +3,6 @@ package com.towich.vktest.network
 import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.util.ApiResult
 
-
 interface ApiService {
     suspend fun getCategories(): ApiResult<List<String>>
     suspend fun getProducts(): ApiResult<List<ProductUIModel>>

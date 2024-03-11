@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,7 +56,6 @@ class MainViewModel @Inject constructor(
         _searchUiState.value = newState
     }
 
-
     private fun getAllCategories() {
         viewModelScope.launch {
             _categoriesUiState.value = CategoriesUiState.Loading
@@ -70,10 +68,6 @@ class MainViewModel @Inject constructor(
 
                 is ApiResult.Error -> {
                     _categoriesUiState.value = CategoriesUiState.Error(result.error)
-                }
-
-                else -> {
-
                 }
             }
         }
@@ -93,10 +87,6 @@ class MainViewModel @Inject constructor(
                 is ApiResult.Error -> {
                     _productsUiState.value = ProductsUiState.Error(result.error)
                 }
-
-                else -> {
-
-                }
             }
         }
     }
@@ -112,24 +102,19 @@ class MainViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     _productsUiState.value = ProductsUiState.Success(result.data)
 
-                    if(category != null){
+                    if (category != null) {
                         _listOfSearchedProducts.value?.addAll(result.data)
-                    }
-                    else{
+                    } else {
                         _listOfProducts.value?.addAll(result.data)
                     }
 
-                    if(result.data.isNotEmpty()){
+                    if (result.data.isNotEmpty()) {
                         currentPage++
                     }
                 }
 
                 is ApiResult.Error -> {
                     _productsUiState.value = ProductsUiState.Error(result.error)
-                }
-
-                else -> {
-
                 }
             }
         }
@@ -149,10 +134,6 @@ class MainViewModel @Inject constructor(
                     _searchUiState.value = SearchUiState.Error(result.error)
                     _listOfSearchedProducts.value = mutableListOf()
                 }
-
-                else -> {
-
-                }
             }
         }
     }
@@ -168,7 +149,7 @@ class MainViewModel @Inject constructor(
                     _currentCategory.value = category
                     _listOfSearchedProducts.value = result.data.toMutableList()
 
-                    if(result.data.isNotEmpty()){
+                    if (result.data.isNotEmpty()) {
                         currentPage++
                     }
 
@@ -176,10 +157,6 @@ class MainViewModel @Inject constructor(
 
                 is ApiResult.Error -> {
                     _categoriesUiState.value = CategoriesUiState.Error(result.error)
-                }
-
-                else -> {
-
                 }
             }
         }

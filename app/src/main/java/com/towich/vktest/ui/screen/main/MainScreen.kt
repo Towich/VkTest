@@ -2,7 +2,6 @@ package com.towich.vktest.ui.screen.main
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +39,6 @@ import com.towich.vktest.navigation.Screen
 import com.towich.vktest.ui.screen.main.components.CategoriesLazyRow
 import com.towich.vktest.ui.screen.main.components.EndlessGrid
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,10 +60,10 @@ fun MainScreen(
     var searchBarQuery by rememberSaveable { mutableStateOf("") }
     var searchBarActive by rememberSaveable { mutableStateOf(false) }
     var showSearchBar by rememberSaveable { mutableStateOf(false) }
-
     var selectedChipIndex by rememberSaveable { mutableStateOf(0) }
 
     val scope = rememberCoroutineScope()
+    val lazyGridState = rememberLazyGridState()
 
     when (productsUiState) {
         is ProductsUiState.Success<*> -> {
@@ -129,8 +126,6 @@ fun MainScreen(
 
         else -> {}
     }
-
-    val lazyGridState = rememberLazyGridState()
 
     Scaffold(
         topBar = {
@@ -208,12 +203,10 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(top = 1.dp)
         ) {
             CategoriesLazyRow(
                 listOfCategories = listOfCategories ?: listOf(),
-                isLoading = categoriesUiState is CategoriesUiState.Loading && listOfCategories == null
-                        || categoriesUiState is CategoriesUiState.Error,
+                isLoading = categoriesUiState is CategoriesUiState.Loading && listOfCategories == null,
                 selectedChipIndex = selectedChipIndex,
                 modifier = Modifier.padding(top = 10.dp),
                 onSelectChip = { category, index ->
@@ -222,7 +215,6 @@ fun MainScreen(
                     if (selectedChipIndex == 0) {
                         viewModel.clearListOfSearchedProducts()
                         viewModel.clearCurrentCategory()
-
                     } else {
                         viewModel.searchProductsByCategory(category = category)
                     }
@@ -233,15 +225,13 @@ fun MainScreen(
                 }
             )
 
-            HorizontalDivider(
-                modifier = Modifier.padding(top = 10.dp)
-            )
+            HorizontalDivider(modifier = Modifier.padding(top = 10.dp))
 
             EndlessGrid(
                 lazyGridState = lazyGridState,
                 listOfProducts = if (currentCategory == null) listOfProducts else listOfSearchedProducts,
                 isLoading = (productsUiState is ProductsUiState.Loading && listOfProducts == null)
-                        || (categoriesUiState is CategoriesUiState.Loading) || productsUiState is ProductsUiState.Error,
+                        || (categoriesUiState is CategoriesUiState.Loading),
                 onReachedBottom = {
                     viewModel.loadMoreProducts(category = currentCategory)
                 },
@@ -251,7 +241,5 @@ fun MainScreen(
                 }
             )
         }
-
-
     }
 }

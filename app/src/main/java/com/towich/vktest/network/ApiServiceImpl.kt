@@ -1,6 +1,5 @@
 package com.towich.vktest.network
 
-
 import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.data.source.Constants
 import com.towich.vktest.network.serializable.ListOfProductsSerializable
@@ -9,8 +8,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.appendPathSegments
-import java.io.IOException
-
 
 class ApiServiceImpl(
     private val client: HttpClient
@@ -18,10 +15,10 @@ class ApiServiceImpl(
     override suspend fun getCategories(): ApiResult<List<String>> {
         val url = ApiRoutes.BASE_URL + ApiRoutes.PRODUCTS + ApiRoutes.CATEGORIES
 
-        try {
+        return try {
             val response = client.get(url)
 
-            return when(response.status.value){
+            when (response.status.value) {
                 in 200..299 -> {
                     ApiResult.Success(response.body())
                 }
@@ -31,7 +28,7 @@ class ApiServiceImpl(
                 }
             }
         } catch (e: Exception) {
-            return ApiResult.Error("${e.message}")
+            ApiResult.Error("${e.message}")
         }
     }
 
@@ -45,7 +42,7 @@ class ApiServiceImpl(
                 }
             }
 
-            return when(response.status.value){
+            return when (response.status.value) {
                 in 200..299 -> {
                     ApiResult.Success(response.body<ListOfProductsSerializable>().products.map { it.convertToUIModel() })
                 }
@@ -59,9 +56,12 @@ class ApiServiceImpl(
         }
     }
 
-    override suspend fun getProducts(skip: Int, category: String?): ApiResult<List<ProductUIModel>> {
+    override suspend fun getProducts(
+        skip: Int,
+        category: String?
+    ): ApiResult<List<ProductUIModel>> {
         var url = ApiRoutes.BASE_URL + ApiRoutes.PRODUCTS
-        if(category != null){
+        if (category != null) {
             url += ApiRoutes.CATEGORY
         }
 
@@ -69,14 +69,16 @@ class ApiServiceImpl(
         try {
             val response = client.get(url) {
                 url {
-                    if(category != null){ appendPathSegments(category) }
+                    if (category != null) {
+                        appendPathSegments(category)
+                    }
                     parameters.append("skip", skip.toString())
                     parameters.append("limit", Constants.LIMIT_PRODUCTS.toString())
                 }
             }
 
 
-            return when(response.status.value){
+            return when (response.status.value) {
                 in 200..299 -> {
                     ApiResult.Success(response.body<ListOfProductsSerializable>().products.map { it.convertToUIModel() })
                 }
@@ -100,11 +102,11 @@ class ApiServiceImpl(
                 }
             }
 
-            if(response.body<ListOfProductsSerializable>().products.isEmpty()){
+            if (response.body<ListOfProductsSerializable>().products.isEmpty()) {
                 return ApiResult.Error("Empty list!")
             }
 
-            return when(response.status.value){
+            return when (response.status.value) {
                 in 200..299 -> {
                     ApiResult.Success(response.body<ListOfProductsSerializable>().products.map { it.convertToUIModel() })
                 }
@@ -128,7 +130,7 @@ class ApiServiceImpl(
                 }
             }
 
-            return when(response.status.value){
+            return when (response.status.value) {
                 in 200..299 -> {
                     ApiResult.Success(response.body<ListOfProductsSerializable>().products.map { it.convertToUIModel() })
                 }

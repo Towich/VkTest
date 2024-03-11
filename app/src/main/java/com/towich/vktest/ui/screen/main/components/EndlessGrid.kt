@@ -1,6 +1,5 @@
 package com.towich.vktest.ui.screen.main.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -24,7 +23,7 @@ fun EndlessGrid(
     modifier: Modifier = Modifier,
     onReachedBottom: () -> Unit = {},
     onProductClicked: (product: ProductUIModel) -> Unit = {}
-){
+) {
     val buffer = 1 // load more when scroll reaches last n item, where n >= 1
 
     val reachedBottom: Boolean by remember {
@@ -36,7 +35,7 @@ fun EndlessGrid(
 
     // load more if scrolled to bottom
     LaunchedEffect(reachedBottom) {
-        if(reachedBottom) onReachedBottom()
+        if (reachedBottom) onReachedBottom()
     }
 
     LazyVerticalGrid(
@@ -44,22 +43,16 @@ fun EndlessGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         modifier = modifier
     ) {
-        if(isLoading){
-            items(count = 10){
+        if (isLoading) {
+            items(count = 10) {
                 ProductItemShimmerEffect()
             }
-        }
-        else{
-            itemsIndexed(
-                items = listOfProducts ?: listOf(),
-                key = { _: Int, item: ProductUIModel ->
-                    item.hashCode()
-                }
-            ) { _, item ->
-                ProductItem(productUIModel = item){
+        } else {
+            itemsIndexed(items = listOfProducts ?: listOf()) { _, item ->
+                ProductItem(productUIModel = item) {
                     onProductClicked(item)
                 }
             }

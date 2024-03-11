@@ -1,6 +1,5 @@
 package com.towich.vktest.di
 
-import android.app.Application
 import com.towich.vktest.data.repository.MainRepository
 import com.towich.vktest.data.repository.MainRepositoryImpl
 import com.towich.vktest.data.source.SessionStorage
@@ -18,16 +17,15 @@ object AppModule {
     @Provides
     @Singleton
     fun provideMainRepository(
-        app: Application,
         apiService: ApiService,
         sessionStorage: SessionStorage
     ): MainRepository {
         return MainRepositoryImpl(
-            appContext = app,
             apiService = apiService,
             sessionStorage = sessionStorage
         )
     }
+
     @Provides
     @Singleton
     fun provideSessionStorage(): SessionStorage {

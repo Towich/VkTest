@@ -9,7 +9,6 @@ interface MainRepository {
     suspend fun getProducts(skip: Int, category: String?): ApiResult<List<ProductUIModel>>
     suspend fun getProductsByQuery(query: String): ApiResult<List<ProductUIModel>>
     suspend fun getProductsByCategory(category: String): ApiResult<List<ProductUIModel>>
-
     fun getCurrentProduct(): ProductUIModel?
     fun setCurrentProduct(newProduct: ProductUIModel)
 }

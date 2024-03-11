@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.towich.vktest.R
 import com.towich.vktest.data.model.ProductUIModel
+import com.towich.vktest.data.source.Constants
 import com.towich.vktest.ui.theme.Green
 import com.towich.vktest.ui.theme.VkTestTheme
 
@@ -47,19 +48,23 @@ fun ProductItem(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(30.dp))
+            .shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(30.dp)
+            )
             .background(MaterialTheme.colorScheme.background)
+            .clip(RoundedCornerShape(30.dp))
+
             .border(
                 width = 1.dp,
                 color = Color.Gray.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(30.dp)
             )
-            .shadow(elevation = 10.dp)
             .clickable {
                 onClick()
             }
     ) {
-        Column() {
+        Column {
             Box(
                 modifier = Modifier
                     .height(200.dp)
@@ -129,13 +134,13 @@ fun ProductItem(
     }
 }
 
-//@Preview(widthDp = 200, heightDp = 350)
-//@Composable
-//private fun Preview() {
-//    VkTestTheme {
-//        ProductItem(productUIModel = DebugObject.listOfProducts[0])
-//    }
-//}
+@Preview(widthDp = 200, heightDp = 350)
+@Composable
+private fun Preview() {
+    VkTestTheme {
+        ProductItem(productUIModel = Constants.errorProduct){}
+    }
+}
 
 @Preview(widthDp = 200, heightDp = 350)
 @Composable

@@ -1,6 +1,5 @@
 package com.towich.vktest.network.serializable
 
-import com.towich.vktest.data.model.ProductUIModel
 import kotlinx.serialization.Serializable
 
 @Serializable

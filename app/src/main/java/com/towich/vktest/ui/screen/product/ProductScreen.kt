@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -156,9 +154,9 @@ fun ProductScreen(
 
                 Box(
                     modifier = Modifier
+                        .padding(horizontal = 16.dp)
                         .height(30.dp)
                         .width(IntrinsicSize.Min)
-                        .padding(horizontal = 16.dp)
                         .border(
                             width = 1.dp,
                             color = Color.Gray.copy(alpha = 0.2f),

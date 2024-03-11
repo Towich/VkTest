@@ -27,6 +27,10 @@ fun ProductItemShimmerEffect() {
     Surface(
         modifier = Modifier
             .fillMaxSize()
+            .shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(30.dp)
+            )
             .clip(RoundedCornerShape(30.dp))
             .background(MaterialTheme.colorScheme.background)
             .border(
@@ -34,10 +38,9 @@ fun ProductItemShimmerEffect() {
                 color = Color.Gray.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(30.dp)
             )
-            .shadow(elevation = 10.dp)
             .shimmerEffect(),
     ) {
-        Column() {
+        Column {
             Box(
                 modifier = Modifier
                     .height(200.dp)
@@ -56,30 +59,16 @@ fun ProductItemShimmerEffect() {
             Column(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
-                Box(modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(30.dp)
-                    .padding(top = 10.dp)
-//                    .background(color = Color.Gray)
-                    .clip(RoundedCornerShape(30.dp))
-                    .shimmerEffect()
-                )
-                Box(modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(30.dp)
-                    .padding(top = 10.dp)
-//                    .background(color = Color.Gray)
-                    .clip(RoundedCornerShape(30.dp))
-                    .shimmerEffect()
-                )
-                Box(modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .height(30.dp)
-                    .padding(top = 10.dp)
-//                    .background(color = Color.Gray)
-                    .clip(RoundedCornerShape(30.dp))
-                    .shimmerEffect()
-                )
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .height(30.dp)
+                            .padding(top = 10.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .shimmerEffect()
+                    )
+                }
             }
         }
     }
