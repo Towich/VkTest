@@ -23,7 +23,10 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             VkTestTheme {
-                Navigation(navController = navController)
+                Navigation(
+                    navController = navController,
+                    context = applicationContext
+                )
             }
         }
     }

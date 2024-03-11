@@ -10,44 +10,88 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: MainRepository
-): ViewModel() {
-    private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Initial)
-    val uiState: StateFlow<MainScreenUiState> = _uiState
+) : ViewModel() {
+    private val _productsUiState = MutableStateFlow<ProductsUiState>(ProductsUiState.Initial)
+    val productsUiState: StateFlow<ProductsUiState> = _productsUiState
+
+    private val _categoriesUiState = MutableStateFlow<CategoriesUiState>(CategoriesUiState.Initial)
+    val categoriesUiState: StateFlow<CategoriesUiState> = _categoriesUiState
+
+    private val _searchUiState = MutableStateFlow<SearchUiState>(SearchUiState.Initial)
+    val searchUiState: StateFlow<SearchUiState> = _searchUiState
 
     private val _listOfProducts = MutableStateFlow<MutableList<ProductUIModel>?>(null)
     val listOfProducts: StateFlow<List<ProductUIModel>?> = _listOfProducts
 
-    private val _listOfSearchedProducts = MutableStateFlow<List<ProductUIModel>?>(null)
+    private val _listOfSearchedProducts = MutableStateFlow<MutableList<ProductUIModel>?>(null)
     val listOfSearchedProducts: StateFlow<List<ProductUIModel>?> = _listOfSearchedProducts
+
+    private val _listOfCategories = MutableStateFlow<List<String>?>(null)
+    val listOfCategories: StateFlow<List<String>?> = _listOfCategories
+
+    private val _currentCategory = MutableStateFlow<String?>(null)
+    val currentCategory: StateFlow<String?> = _currentCategory
 
     private var currentPage = 0
 
     init {
-        performGetListOfProducts()
+        getAllCategories()
+        getAllProducts()
     }
 
-    fun changeUiState(newState: MainScreenUiState){
-        _uiState.value = newState
+    fun changeProductsUiState(newState: ProductsUiState) {
+        _productsUiState.value = newState
     }
 
-    private fun performGetListOfProducts() {
+    fun changeCategoriesUiState(newState: CategoriesUiState) {
+        _categoriesUiState.value = newState
+    }
+
+    fun changeSearchUiState(newState: SearchUiState) {
+        _searchUiState.value = newState
+    }
+
+
+    private fun getAllCategories() {
         viewModelScope.launch {
-            _uiState.value = MainScreenUiState.Loading
+            _categoriesUiState.value = CategoriesUiState.Loading
+
+            when (val result = repository.getCategories()) {
+                is ApiResult.Success -> {
+                    _categoriesUiState.value = CategoriesUiState.Success(result.data)
+                    _listOfCategories.value = result.data
+                }
+
+                is ApiResult.Error -> {
+                    _categoriesUiState.value = CategoriesUiState.Error(result.error)
+                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    private fun getAllProducts() {
+        viewModelScope.launch {
+            _productsUiState.value = ProductsUiState.Loading
 
             when (val result = repository.getProducts()) {
                 is ApiResult.Success -> {
-                    _uiState.value = MainScreenUiState.Success(result.data)
+                    _productsUiState.value = ProductsUiState.Success(result.data)
                     _listOfProducts.value = result.data.toMutableList()
                     currentPage++
                 }
 
                 is ApiResult.Error -> {
-                    _uiState.value = MainScreenUiState.Error(result.error)
+                    _productsUiState.value = ProductsUiState.Error(result.error)
                 }
 
                 else -> {
@@ -57,19 +101,31 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreProducts(){
+    fun loadMoreProducts(category: String? = null) {
         viewModelScope.launch {
-            _uiState.value = MainScreenUiState.Loading
+            _productsUiState.value = ProductsUiState.Loading
 
-            when (val result = repository.getProducts(currentPage * Constants.LIMIT_PRODUCTS)) {
+            when (val result = repository.getProducts(
+                skip = currentPage * Constants.LIMIT_PRODUCTS,
+                category = category
+            )) {
                 is ApiResult.Success -> {
-                    _uiState.value = MainScreenUiState.Success(result.data)
-                    _listOfProducts.value?.addAll(result.data)
-                    currentPage++
+                    _productsUiState.value = ProductsUiState.Success(result.data)
+
+                    if(category != null){
+                        _listOfSearchedProducts.value?.addAll(result.data)
+                    }
+                    else{
+                        _listOfProducts.value?.addAll(result.data)
+                    }
+
+                    if(result.data.isNotEmpty()){
+                        currentPage++
+                    }
                 }
 
                 is ApiResult.Error -> {
-                    _uiState.value = MainScreenUiState.Error(result.error)
+                    _productsUiState.value = ProductsUiState.Error(result.error)
                 }
 
                 else -> {
@@ -79,18 +135,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun searchProducts(query: String){
+    fun searchProducts(query: String) {
         viewModelScope.launch {
-            _uiState.value = MainScreenUiState.Loading
+            _searchUiState.value = SearchUiState.Loading
 
-            when (val result = repository.getProducts(query = query)) {
+            when (val result = repository.getProductsByQuery(query = query)) {
                 is ApiResult.Success -> {
-                    _uiState.value = MainScreenUiState.Success(result.data)
-                    _listOfSearchedProducts.value = result.data
+                    _searchUiState.value = SearchUiState.Success(result.data)
+                    _listOfSearchedProducts.value = result.data.toMutableList()
                 }
 
                 is ApiResult.Error -> {
-                    _uiState.value = MainScreenUiState.Error(result.error)
+                    _searchUiState.value = SearchUiState.Error(result.error)
+                    _listOfSearchedProducts.value = mutableListOf()
                 }
 
                 else -> {
@@ -100,11 +157,43 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun setCurrentProduct(newProduct: ProductUIModel){
+    fun searchProductsByCategory(category: String) {
+        currentPage = 0
+        viewModelScope.launch {
+            _categoriesUiState.value = CategoriesUiState.Loading
+
+            when (val result = repository.getProductsByCategory(category = category)) {
+                is ApiResult.Success -> {
+                    _categoriesUiState.value = CategoriesUiState.Success(result.data)
+                    _currentCategory.value = category
+                    _listOfSearchedProducts.value = result.data.toMutableList()
+
+                    if(result.data.isNotEmpty()){
+                        currentPage++
+                    }
+
+                }
+
+                is ApiResult.Error -> {
+                    _categoriesUiState.value = CategoriesUiState.Error(result.error)
+                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun setCurrentProduct(newProduct: ProductUIModel) {
         repository.setCurrentProduct(newProduct)
     }
 
-    fun clearListOfSearchedProducts(){
+    fun clearListOfSearchedProducts() {
         _listOfSearchedProducts.value = null
+    }
+
+    fun clearCurrentCategory() {
+        _currentCategory.value = null
     }
 }

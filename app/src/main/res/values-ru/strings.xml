@@ -9,4 +9,6 @@
     <string name="star_icon">Иконка звезды</string>
     <string name="remain_in_stock">Осталось</string>
     <string name="quantity_stock">шт</string>
+    <string name="chip_all">Все</string>
+    <string name="empty_search">Нет ни одного товара</string>
 </resources>

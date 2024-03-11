@@ -1,5 +1,10 @@
 package com.towich.vktest.ui.screen.main
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -20,9 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,29 +38,93 @@ import androidx.navigation.NavController
 import com.towich.vktest.R
 import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.navigation.Screen
+import com.towich.vktest.ui.screen.main.components.CategoriesLazyRow
 import com.towich.vktest.ui.screen.main.components.EndlessGrid
+import kotlinx.coroutines.launch
+import java.util.concurrent.locks.ReentrantLock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
+    context: Context,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val productsUiState by viewModel.productsUiState.collectAsState()
+    val categoriesUiState by viewModel.categoriesUiState.collectAsState()
+    val searchUiState by viewModel.searchUiState.collectAsState()
+
     val listOfProducts by viewModel.listOfProducts.collectAsState()
     val listOfSearchedProducts by viewModel.listOfSearchedProducts.collectAsState()
+    val listOfCategories by viewModel.listOfCategories.collectAsState()
+    val currentCategory by viewModel.currentCategory.collectAsState()
 
     var searchBarText by rememberSaveable { mutableStateOf("") }
+    var searchBarQuery by rememberSaveable { mutableStateOf("") }
     var searchBarActive by rememberSaveable { mutableStateOf(false) }
     var showSearchBar by rememberSaveable { mutableStateOf(false) }
 
-    when (uiState) {
-        is MainScreenUiState.Success<*> -> {
-            viewModel.changeUiState(MainScreenUiState.Initial)
+    var selectedChipIndex by rememberSaveable { mutableStateOf(0) }
+
+    val scope = rememberCoroutineScope()
+
+    when (productsUiState) {
+        is ProductsUiState.Success<*> -> {
+            viewModel.changeProductsUiState(ProductsUiState.Initial)
         }
 
-        is MainScreenUiState.Error -> {
-            // TODO
+        is ProductsUiState.Error -> {
+            Toast.makeText(
+                context,
+                (productsUiState as ProductsUiState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            viewModel.changeProductsUiState(ProductsUiState.Initial)
+        }
+
+        else -> {}
+    }
+    when (categoriesUiState) {
+        is CategoriesUiState.Success<*> -> {
+            viewModel.changeCategoriesUiState(CategoriesUiState.Initial)
+        }
+
+        is CategoriesUiState.Error -> {
+            Toast.makeText(
+                context,
+                (categoriesUiState as CategoriesUiState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            viewModel.changeCategoriesUiState(CategoriesUiState.Initial)
+        }
+
+        else -> {}
+    }
+    when (searchUiState) {
+        is SearchUiState.Success<*> -> {
+            viewModel.changeSearchUiState(SearchUiState.Initial)
+        }
+
+        is SearchUiState.Error -> {
+            if ((searchUiState as SearchUiState.Error).message == "Empty list!") {
+                Toast.makeText(
+                    context,
+                    "${stringResource(id = R.string.empty_search)} " +
+                            "'${searchBarQuery}'!",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            } else {
+                Toast.makeText(
+                    context,
+                    (searchUiState as SearchUiState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            viewModel.changeSearchUiState(SearchUiState.Initial)
         }
 
         else -> {}
@@ -74,13 +144,19 @@ fun MainScreen(
                         searchBarText = it
                     },
                     onSearch = { query ->
+                        searchBarQuery = query
                         viewModel.searchProducts(query)
                     },
                     active = searchBarActive,
                     onActiveChange = {
                         searchBarActive = it
                         if (!searchBarActive) {
+                            viewModel.clearListOfSearchedProducts()
+                            selectedChipIndex = 0
                             showSearchBar = false
+                            scope.launch {
+                                lazyGridState.scrollToItem(0)
+                            }
                         }
                     },
                     placeholder = {
@@ -93,7 +169,7 @@ fun MainScreen(
                     EndlessGrid(
                         lazyGridState = rememberLazyGridState(),
                         listOfProducts = listOfSearchedProducts,
-                        isLoading = uiState is MainScreenUiState.Loading,
+                        isLoading = searchUiState is SearchUiState.Loading,
                         onProductClicked = { product: ProductUIModel ->
                             viewModel.setCurrentProduct(product)
                             navController.navigate(Screen.ProductScreen.route)
@@ -113,6 +189,7 @@ fun MainScreen(
                             showSearchBar = true
                             searchBarText = ""
                             viewModel.clearListOfSearchedProducts()
+                            viewModel.clearCurrentCategory()
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Search,
@@ -127,26 +204,54 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(innerPadding)
-        )
-
-        EndlessGrid(
-            lazyGridState = lazyGridState,
-            listOfProducts = listOfProducts,
-            isLoading = uiState is MainScreenUiState.Loading && listOfProducts == null,
+        Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
-                .padding(1.dp),
-            onReachedBottom = {
-                viewModel.loadMoreProducts()
-            },
-            onProductClicked = { product: ProductUIModel ->
-                viewModel.setCurrentProduct(product)
-                navController.navigate(Screen.ProductScreen.route)
-            }
-        )
+                .padding(top = 1.dp)
+        ) {
+            CategoriesLazyRow(
+                listOfCategories = listOfCategories ?: listOf(),
+                isLoading = categoriesUiState is CategoriesUiState.Loading && listOfCategories == null
+                        || categoriesUiState is CategoriesUiState.Error,
+                selectedChipIndex = selectedChipIndex,
+                modifier = Modifier.padding(top = 10.dp),
+                onSelectChip = { category, index ->
+                    selectedChipIndex = index
+
+                    if (selectedChipIndex == 0) {
+                        viewModel.clearListOfSearchedProducts()
+                        viewModel.clearCurrentCategory()
+
+                    } else {
+                        viewModel.searchProductsByCategory(category = category)
+                    }
+
+                    scope.launch {
+                        lazyGridState.scrollToItem(index = 0)
+                    }
+                }
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            EndlessGrid(
+                lazyGridState = lazyGridState,
+                listOfProducts = if (currentCategory == null) listOfProducts else listOfSearchedProducts,
+                isLoading = (productsUiState is ProductsUiState.Loading && listOfProducts == null)
+                        || (categoriesUiState is CategoriesUiState.Loading) || productsUiState is ProductsUiState.Error,
+                onReachedBottom = {
+                    viewModel.loadMoreProducts(category = currentCategory)
+                },
+                onProductClicked = { product: ProductUIModel ->
+                    viewModel.setCurrentProduct(product)
+                    navController.navigate(Screen.ProductScreen.route)
+                }
+            )
+        }
+
+
     }
 }

@@ -1,5 +1,6 @@
 package com.towich.vktest.ui.screen.main.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -47,7 +48,7 @@ fun EndlessGrid(
         modifier = modifier
     ) {
         if(isLoading){
-            items(count = 6){
+            items(count = 10){
                 ProductItemShimmerEffect()
             }
         }

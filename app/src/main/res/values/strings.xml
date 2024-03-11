@@ -8,4 +8,6 @@
     <string name="star_icon">Icon of star</string>
     <string name="remain_in_stock">Stock</string>
     <string name="quantity_stock">pcs</string>
+    <string name="chip_all">All</string>
+    <string name="empty_search">No one product matched</string>
 </resources>

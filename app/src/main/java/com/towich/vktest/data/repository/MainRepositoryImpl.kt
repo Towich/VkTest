@@ -11,16 +11,24 @@ class MainRepositoryImpl(
     private val apiService: ApiService,
     private val sessionStorage: SessionStorage
 ): MainRepository {
+    override suspend fun getCategories(): ApiResult<List<String>> {
+        return apiService.getCategories()
+    }
+
     override suspend fun getProducts(): ApiResult<List<ProductUIModel>> {
         return apiService.getProducts()
     }
 
-    override suspend fun getProducts(skip: Int): ApiResult<List<ProductUIModel>> {
-        return apiService.getProducts(skip = skip)
+    override suspend fun getProducts(skip: Int, category: String?): ApiResult<List<ProductUIModel>> {
+        return apiService.getProducts(skip = skip, category = category)
     }
 
-    override suspend fun getProducts(query: String): ApiResult<List<ProductUIModel>> {
-        return apiService.getProducts(query = query)
+    override suspend fun getProductsByQuery(query: String): ApiResult<List<ProductUIModel>> {
+        return apiService.getProductsByQuery(query = query)
+    }
+
+    override suspend fun getProductsByCategory(category: String): ApiResult<List<ProductUIModel>> {
+        return apiService.getProductsByCategory(category = category)
     }
 
     override fun getCurrentProduct(): ProductUIModel? {
