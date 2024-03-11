@@ -24,10 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.towich.vktest.R
 import com.towich.vktest.data.model.ProductUIModel
 import com.towich.vktest.navigation.Screen
 import com.towich.vktest.ui.screen.main.components.EndlessGrid
@@ -82,7 +84,7 @@ fun MainScreen(
                         }
                     },
                     placeholder = {
-                        Text(text = "Enter a product..")
+                        Text(text = stringResource(id = R.string.search_bar_placeholder))
                     },
                     colors = SearchBarDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.background
@@ -102,7 +104,7 @@ fun MainScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Главная",
+                            text = stringResource(id = R.string.mainscreen_top_bar_title),
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -112,7 +114,10 @@ fun MainScreen(
                             searchBarText = ""
                             viewModel.clearListOfSearchedProducts()
                         }) {
-                            Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = stringResource(id = R.string.button_search)
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

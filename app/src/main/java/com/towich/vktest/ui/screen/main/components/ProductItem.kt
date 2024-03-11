@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,7 +74,7 @@ fun ProductItem(
             ) {
                 SubcomposeAsyncImage(
                     model = productUIModel.thumbnail,
-                    contentDescription = null,
+                    contentDescription = stringResource(id = R.string.image_product),
                     contentScale = ContentScale.FillWidth,
                     loading = {
                         CircularProgressIndicator()
@@ -102,17 +103,17 @@ fun ProductItem(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "${productUIModel.discountPercentage.toInt()}% OFF",
+                        text = "-${productUIModel.discountPercentage.toInt()}%",
                         color = Green,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontSize = 18.sp
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.star_icon),
-                            contentDescription = null,
+                            contentDescription = stringResource(id = R.string.star_icon),
                             tint = Color.Unspecified,
                             modifier = Modifier.size(16.dp)
                         )

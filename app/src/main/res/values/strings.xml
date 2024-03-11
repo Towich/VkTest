@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">VkTest</string>
+    <string name="search_bar_placeholder">Enter a product..</string>
+    <string name="mainscreen_top_bar_title">Home</string>
+    <string name="image_product">Image of product</string>
+    <string name="button_back">Back button</string>
+    <string name="button_search">Search button</string>
+    <string name="star_icon">Icon of star</string>
+    <string name="remain_in_stock">Stock</string>
+    <string name="quantity_stock">pcs</string>
 </resources>

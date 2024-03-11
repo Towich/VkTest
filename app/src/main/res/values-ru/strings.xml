@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VkTest</string>
+    <string name="search_bar_placeholder">Введите товар..</string>
+    <string name="mainscreen_top_bar_title">Главная</string>
+    <string name="image_product">Картинка товара</string>
+    <string name="button_back">Кнопка назад</string>
+    <string name="button_search">Кнопка поиска</string>
+    <string name="star_icon">Иконка звезды</string>
+    <string name="remain_in_stock">Осталось</string>
+    <string name="quantity_stock">шт</string>
+</resources>
